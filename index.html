@@ -2,11 +2,14 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>お手伝いポイントカウントアプリ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="おてつだい">
+<title>お手伝いポイントアプリ</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   :root {
     --mint: #A8E6CF; --mint-light: #E8F8F0; --mint-dark: #2D8A5E;
     --pink: #FFB3C1; --pink-light: #FFF0F3; --pink-dark: #C2435A;
@@ -15,28 +18,58 @@
     --text: #3D3535; --text-sub: #8B7878; --bg: #FFF9F5; --card: #FFFFFF;
     --font: 'M PLUS Rounded 1c', system-ui, sans-serif;
   }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overscroll-behavior: none; }
+
+  /* LOGIN */
+  .login-screen {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 32px 24px;
+    background: linear-gradient(160deg, #FFF0F3 0%, #F0ECFF 50%, #E8F8F0 100%);
+  }
+  .login-logo { font-size: 64px; margin-bottom: 12px; }
+  .login-title { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .login-sub { font-size: 13px; color: var(--text-sub); margin-bottom: 40px; }
+  .login-card { background: white; border-radius: 28px; padding: 28px 24px; width: 100%; max-width: 360px; box-shadow: 0 4px 32px rgba(180,140,200,0.12); }
+  .login-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; display: block; }
+  .login-input { width: 100%; padding: 14px 16px; border-radius: 16px; border: 1.5px solid #EEE5F0; font-family: var(--font); font-size: 15px; color: var(--text); background: var(--bg); margin-bottom: 16px; outline: none; transition: border-color 0.2s; }
+  .login-input:focus { border-color: var(--lavender); }
+  .login-btn { width: 100%; padding: 16px; border-radius: 20px; border: none; background: linear-gradient(135deg, var(--mint) 0%, var(--lavender) 100%); font-family: var(--font); font-size: 16px; font-weight: 800; color: white; cursor: pointer; margin-bottom: 12px; transition: transform 0.1s, opacity 0.2s; }
+  .login-btn:active { transform: scale(0.97); }
+  .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-err { font-size: 12px; color: var(--pink-dark); text-align: center; min-height: 18px; margin-bottom: 4px; }
+  .login-switch { font-size: 12px; color: var(--text-sub); text-align: center; }
+  .login-switch span { color: var(--lavender-dark); font-weight: 700; cursor: pointer; }
+
+  /* APP */
+  .app { display: none; }
+  .app.active { display: block; }
   .nav { display: flex; justify-content: space-around; background: var(--card); border-bottom: 1px solid #F0E8E8; position: sticky; top: 0; z-index: 100; }
   .nav-btn { flex: 1; padding: 12px 4px 10px; border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-family: var(--font); font-size: 10px; color: var(--text-sub); transition: color 0.2s; }
   .nav-btn.active { color: var(--mint-dark); }
   .nav-icon { font-size: 20px; }
-  .screen { display: none; padding: 16px; max-width: 430px; margin: 0 auto; }
+  .screen { display: none; padding: 16px; max-width: 430px; margin: 0 auto; padding-bottom: 32px; }
   .screen.active { display: block; }
 
+  /* USER BADGE */
+  .user-badge { display: flex; align-items: center; justify-content: space-between; background: var(--card); border-radius: 16px; padding: 10px 14px; margin-bottom: 16px; border: 1px solid #F0E8E8; }
+  .user-badge-left { display: flex; align-items: center; gap: 8px; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .avatar-admin { background: var(--yellow-light); }
+  .avatar-user { background: var(--mint-light); }
+  .user-name { font-size: 13px; font-weight: 700; }
+  .user-role { font-size: 10px; color: var(--text-sub); }
+  .logout-btn { font-size: 11px; color: var(--text-sub); background: none; border: 1px solid #EEE; border-radius: 10px; padding: 4px 10px; cursor: pointer; font-family: var(--font); }
+
+  /* HOME */
   .header-greeting { font-size: 13px; color: var(--text-sub); margin-bottom: 2px; }
   .header-title { font-size: 22px; font-weight: 800; margin-bottom: 16px; }
-  .point-card {
-    background: linear-gradient(135deg, #A8E6CF 0%, #C9B8FF 50%, #FFB3C1 100%);
-    border-radius: 28px; padding: 28px 24px 24px; text-align: center; margin-bottom: 20px;
-    position: relative; overflow: hidden;
-  }
+  .point-card { background: linear-gradient(135deg, #A8E6CF 0%, #C9B8FF 50%, #FFB3C1 100%); border-radius: 28px; padding: 28px 24px 24px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; }
   .point-card::before { content:''; position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:rgba(255,255,255,0.2); border-radius:50%; }
   .point-card::after { content:''; position:absolute; bottom:-20px; left:-20px; width:80px; height:80px; background:rgba(255,255,255,0.15); border-radius:50%; }
   .point-label { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 1px; margin-bottom: 4px; }
   .point-number { font-size: 72px; font-weight: 800; color: white; line-height: 1; text-shadow: 0 2px 12px rgba(100,60,120,0.2); }
   .point-unit { font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.9); margin-left: 4px; }
   .point-sub { font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 6px; }
-
   .goal-banner { background: linear-gradient(135deg, #FFE4F0, #F0ECFF); border-radius: 20px; padding: 16px 18px; margin-bottom: 20px; border: 2px solid #F4C8DC; }
   .goal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .goal-title { font-size: 15px; font-weight: 800; color: #C2435A; }
@@ -44,7 +77,6 @@
   .goal-bar-bg { height: 12px; background: rgba(255,255,255,0.7); border-radius: 12px; overflow: hidden; }
   .goal-bar-fill { height: 100%; border-radius: 12px; background: linear-gradient(90deg, #FFB3C1 0%, #C9B8FF 50%, #A8E6CF 100%); transition: width 0.6s ease; }
   .goal-milestones { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: var(--text-sub); }
-
   .next-reward-card { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 20px; border: 1.5px solid #F0E8E8; display: flex; align-items: center; gap: 12px; }
   .next-reward-emoji { font-size: 28px; }
   .next-reward-info { flex: 1; }
@@ -53,19 +85,23 @@
   .next-reward-bar-bg { height: 8px; background: #F5EFEF; border-radius: 8px; overflow: hidden; }
   .next-reward-bar-fill { height: 100%; background: linear-gradient(90deg, var(--mint) 0%, var(--lavender) 100%); border-radius: 8px; transition: width 0.5s ease; }
   .next-reward-pts { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
-
-  .section-title { font-size: 14px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; }
   .history-list { display: flex; flex-direction: column; gap: 8px; }
+
+  /* HISTORY ITEMS */
   .history-item { background: var(--card); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; border: 1px solid #F5EFEF; transition: opacity 0.3s, transform 0.3s; }
   .history-item.deleting { opacity: 0; transform: translateX(30px); }
   .history-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
   .history-info { flex: 1; }
   .history-name { font-size: 13px; font-weight: 700; }
   .history-time { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+  .history-who { font-size: 10px; color: var(--lavender-dark); font-weight: 700; margin-top: 2px; }
   .history-pts { font-size: 16px; font-weight: 800; color: var(--mint-dark); margin-right: 6px; }
   .delete-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #F5C0C0; background: #FFF5F5; color: #E07070; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, transform 0.1s; }
   .delete-btn:active { transform: scale(0.9); background: #FFE0E0; }
+  .delete-btn-hidden { visibility: hidden; }
 
+  /* ADD */
   .add-header { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
   .add-sub { font-size: 12px; color: var(--text-sub); margin-bottom: 20px; }
   .tier-label { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
@@ -95,8 +131,9 @@
   .add-btn:active { transform: scale(0.97); opacity: 0.9; }
   .add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  /* HISTORY SCREEN */
   .history-screen-header { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-  .history-screen-sub { font-size: 12px; color: var(--text-sub); margin-bottom: 20px; }
+  .history-screen-sub { font-size: 12px; color: var(--text-sub); margin-bottom: 16px; }
   .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #E8E0F0; background: var(--card); font-family: var(--font); font-size: 12px; font-weight: 700; color: var(--text-sub); cursor: pointer; transition: all 0.15s; }
   .filter-btn.active { background: var(--lavender-light); border-color: var(--lavender-dark); color: var(--lavender-dark); }
@@ -105,19 +142,15 @@
   .history-date-label { font-size: 11px; font-weight: 700; color: var(--text-sub); padding: 6px 4px; display: flex; align-items: center; gap: 6px; }
   .history-date-label::after { content:''; flex:1; height:1px; background:#F0E8E8; }
   .date-pts { font-size: 11px; color: var(--mint-dark); font-weight: 700; margin-left: 4px; }
+  .admin-only-note { font-size: 11px; color: var(--pink-dark); background: var(--pink-light); border-radius: 10px; padding: 8px 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
 
-  .delete-confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 9990; display: none; align-items: flex-end; justify-content: center; padding: 20px; }
-  .delete-confirm-overlay.show { display: flex; }
-  .delete-confirm-card { background: white; border-radius: 24px; padding: 24px 20px; width: 100%; max-width: 400px; animation: slideUp 0.25s ease; }
-  @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
-  .delete-confirm-emoji { font-size: 36px; text-align: center; margin-bottom: 10px; }
-  .delete-confirm-title { font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 6px; }
-  .delete-confirm-sub { font-size: 13px; color: var(--text-sub); text-align: center; margin-bottom: 20px; line-height: 1.6; }
-  .delete-confirm-item { background: #FFF5F5; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid #F5C0C0; }
-  .delete-confirm-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .btn-cancel { padding: 14px; border-radius: 16px; border: 1.5px solid #E8E0F0; background: var(--card); font-family: var(--font); font-size: 14px; font-weight: 700; color: var(--text-sub); cursor: pointer; }
-  .btn-delete { padding: 14px; border-radius: 16px; border: none; background: linear-gradient(135deg, #FFB3C1, #F07070); font-family: var(--font); font-size: 14px; font-weight: 800; color: white; cursor: pointer; }
+  /* NOTIFICATION PERMISSION BANNER */
+  .notif-banner { background: var(--lavender-light); border-radius: 16px; padding: 12px 14px; margin-bottom: 16px; border: 1.5px solid var(--lavender); display: flex; align-items: center; gap: 10px; }
+  .notif-banner-info { flex: 1; font-size: 12px; color: var(--lavender-dark); font-weight: 700; }
+  .notif-banner-sub { font-size: 11px; color: var(--text-sub); font-weight: 400; margin-top: 2px; }
+  .notif-allow-btn { padding: 8px 14px; border-radius: 14px; border: none; background: var(--lavender-dark); color: white; font-family: var(--font); font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 
+  /* REWARDS */
   .reward-header { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
   .reward-sub { font-size: 12px; color: var(--text-sub); margin-bottom: 20px; }
   .current-pts-badge { background: linear-gradient(135deg, var(--mint-light), var(--lavender-light)); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border: 1.5px solid var(--mint); }
@@ -135,6 +168,18 @@
   .reward-achieved-badge { background: var(--mint-dark); color: white; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 20px; white-space: nowrap; }
   .reward-next-badge { background: #FFB3C1; color: #C2435A; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 20px; white-space: nowrap; }
 
+  /* MODALS */
+  .delete-confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 9990; display: none; align-items: flex-end; justify-content: center; padding: 20px; }
+  .delete-confirm-overlay.show { display: flex; }
+  .delete-confirm-card { background: white; border-radius: 24px; padding: 24px 20px; width: 100%; max-width: 400px; animation: slideUp 0.25s ease; }
+  @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .delete-confirm-emoji { font-size: 36px; text-align: center; margin-bottom: 10px; }
+  .delete-confirm-title { font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 6px; }
+  .delete-confirm-sub { font-size: 13px; color: var(--text-sub); text-align: center; margin-bottom: 20px; line-height: 1.6; }
+  .delete-confirm-item { background: #FFF5F5; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid #F5C0C0; }
+  .delete-confirm-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-cancel { padding: 14px; border-radius: 16px; border: 1.5px solid #E8E0F0; background: var(--card); font-family: var(--font); font-size: 14px; font-weight: 700; color: var(--text-sub); cursor: pointer; }
+  .btn-delete { padding: 14px; border-radius: 16px; border: none; background: linear-gradient(135deg, #FFB3C1, #F07070); font-family: var(--font); font-size: 14px; font-weight: 800; color: white; cursor: pointer; }
   .goal-achieved-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9998; align-items: center; justify-content: center; padding: 20px; }
   .goal-achieved-modal.show { display: flex; }
   .goal-achieved-card { background: white; border-radius: 28px; padding: 36px 28px; text-align: center; max-width: 320px; width: 100%; animation: popIn 0.4s ease; }
@@ -144,6 +189,7 @@
   .modal-sub { font-size: 14px; color: var(--text-sub); margin-bottom: 20px; line-height: 1.6; }
   .modal-close { width: 100%; padding: 14px; border-radius: 20px; border: none; background: linear-gradient(135deg, var(--mint), var(--lavender)); font-family: var(--font); font-size: 15px; font-weight: 800; color: white; cursor: pointer; }
 
+  /* SPARKLE + TOAST */
   .sparkle-container { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
   .sparkle { position: absolute; font-size: 24px; animation: sparkle-fly 1.2s ease-out forwards; pointer-events: none; }
   @keyframes sparkle-fly { 0%{transform:translateY(0) scale(0.5);opacity:1} 100%{transform:translateY(-120px) scale(1.5);opacity:0} }
@@ -151,79 +197,109 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .empty-state { text-align: center; padding: 32px 16px; color: var(--text-sub); font-size: 13px; }
   .empty-emoji { font-size: 40px; margin-bottom: 10px; }
+  .loading { text-align: center; padding: 40px; color: var(--text-sub); font-size: 14px; }
+  .loading-spinner { font-size: 32px; animation: spin 1s linear infinite; display: inline-block; margin-bottom: 8px; }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <button class="nav-btn active" onclick="showScreen('home')"><span class="nav-icon">🏠</span>ホーム</button>
-  <button class="nav-btn" onclick="showScreen('add')"><span class="nav-icon">＋</span>追加</button>
-  <button class="nav-btn" onclick="showScreen('history')"><span class="nav-icon">📋</span>履歴</button>
-  <button class="nav-btn" onclick="showScreen('rewards')"><span class="nav-icon">🎁</span>ごほうび</button>
-</nav>
-
-<!-- HOME -->
-<div id="screen-home" class="screen active">
-  <p class="header-greeting" id="greeting">おはよう ☀️</p>
-  <h1 class="header-title">今日もありがとう！</h1>
-  <div class="point-card">
-    <p class="point-label">✨ 累計ポイント</p>
-    <p><span class="point-number" id="total-pts">0</span><span class="point-unit">pt</span></p>
-    <p class="point-sub" id="today-pts-label">今日 +0pt 獲得！</p>
+<!-- LOGIN -->
+<div id="login-screen" class="login-screen">
+  <div class="login-logo">🏠</div>
+  <h1 class="login-title">おてつだいポイント</h1>
+  <p class="login-sub">家事をポイントに変えて、同棲へ！</p>
+  <div class="login-card">
+    <label class="login-label">ニックネーム</label>
+    <input class="login-input" type="text" id="login-name" placeholder="例：さくら" maxlength="10">
+    <label class="login-label">パスワード</label>
+    <input class="login-input" type="password" id="login-pass" placeholder="パスワードを入力">
+    <p class="login-err" id="login-err"></p>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+    <p class="login-switch">はじめての方は <span onclick="toggleRegister()">新規登録</span></p>
   </div>
-  <div class="goal-banner">
-    <div class="goal-top">
-      <span class="goal-title">🏠 ゴール：同棲まで</span>
-      <span class="goal-count" id="goal-count">0 / 1000 pt</span>
+</div>
+
+<!-- APP -->
+<div id="app" class="app">
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showScreen('home')"><span class="nav-icon">🏠</span>ホーム</button>
+    <button class="nav-btn" onclick="showScreen('add')"><span class="nav-icon">＋</span>追加</button>
+    <button class="nav-btn" onclick="showScreen('history')"><span class="nav-icon">📋</span>履歴</button>
+    <button class="nav-btn" onclick="showScreen('rewards')"><span class="nav-icon">🎁</span>ごほうび</button>
+  </nav>
+
+  <!-- HOME -->
+  <div id="screen-home" class="screen active">
+    <div class="user-badge">
+      <div class="user-badge-left">
+        <div class="user-avatar" id="home-avatar">👤</div>
+        <div><p class="user-name" id="home-username">-</p><p class="user-role" id="home-role">-</p></div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
     </div>
-    <div class="goal-bar-bg"><div class="goal-bar-fill" id="goal-fill" style="width:0%"></div></div>
-    <div class="goal-milestones"><span>0</span><span>250</span><span>500</span><span>750</span><span>1000🏠</span></div>
-  </div>
-  <div class="next-reward-card">
-    <span class="next-reward-emoji" id="next-emoji">🥤</span>
-    <div class="next-reward-info">
-      <p class="next-reward-label">次のごほうびまで</p>
-      <p class="next-reward-name" id="next-reward-name">ジュース</p>
-      <div class="next-reward-bar-bg"><div class="next-reward-bar-fill" id="next-reward-fill" style="width:0%"></div></div>
-      <p class="next-reward-pts" id="next-reward-pts">0 / 10 pt</p>
+    <p class="header-greeting" id="greeting">おはよう ☀️</p>
+    <h1 class="header-title">今日もありがとう！</h1>
+    <div class="point-card">
+      <p class="point-label">✨ 累計ポイント</p>
+      <p><span class="point-number" id="total-pts">0</span><span class="point-unit">pt</span></p>
+      <p class="point-sub" id="today-pts-label">今日 +0pt 獲得！</p>
     </div>
+    <div class="goal-banner">
+      <div class="goal-top">
+        <span class="goal-title">🏠 ゴール：同棲まで</span>
+        <span class="goal-count" id="goal-count">0 / 1000 pt</span>
+      </div>
+      <div class="goal-bar-bg"><div class="goal-bar-fill" id="goal-fill" style="width:0%"></div></div>
+      <div class="goal-milestones"><span>0</span><span>250</span><span>500</span><span>750</span><span>1000🏠</span></div>
+    </div>
+    <div class="next-reward-card">
+      <span class="next-reward-emoji" id="next-emoji">🥤</span>
+      <div class="next-reward-info">
+        <p class="next-reward-label">次のごほうびまで</p>
+        <p class="next-reward-name" id="next-reward-name">ジュース</p>
+        <div class="next-reward-bar-bg"><div class="next-reward-bar-fill" id="next-reward-fill" style="width:0%"></div></div>
+        <p class="next-reward-pts" id="next-reward-pts">0 / 10 pt</p>
+      </div>
+    </div>
+    <p class="section-title">📋 今日の履歴</p>
+    <div class="history-list" id="history-list-home"></div>
   </div>
-  <div class="section-title">📋 今日の履歴</div>
-  <div class="history-list" id="history-list-home"></div>
-</div>
 
-<!-- ADD -->
-<div id="screen-add" class="screen">
-  <h2 class="add-header">何をしましたか？</h2>
-  <p class="add-sub">タップして選んでね。複数選択もできるよ！</p>
-  <div class="tier-label"><span class="tier-badge tier-3">★★★ 3pt</span><span class="tier-desc">大変なお仕事！</span></div>
-  <div class="chore-grid" id="grid-3"></div>
-  <div class="tier-label"><span class="tier-badge tier-2">★★ 2pt</span><span class="tier-desc">ちょっと大変なお仕事</span></div>
-  <div class="chore-grid" id="grid-2"></div>
-  <div class="tier-label"><span class="tier-badge tier-1">★ 1pt</span><span class="tier-desc">日常のお仕事</span></div>
-  <div class="chore-grid" id="grid-1"></div>
-  <button class="add-btn" id="add-confirm-btn" onclick="confirmAdd()" disabled>
-    <span>ポイントを追加する</span><span id="add-pts-preview"></span>
-  </button>
-</div>
-
-<!-- HISTORY -->
-<div id="screen-history" class="screen">
-  <h2 class="history-screen-header">📋 履歴・取り消し</h2>
-  <p class="history-screen-sub">間違えたお仕事は ✕ ボタンで取り消せるよ</p>
-  <div class="filter-row" id="filter-row"></div>
-  <div class="full-history-list" id="full-history-list"></div>
-</div>
-
-<!-- REWARDS -->
-<div id="screen-rewards" class="screen">
-  <h2 class="reward-header">🎁 ごほうびリスト</h2>
-  <p class="reward-sub">ポイントをためてご褒美をゲットしよう！</p>
-  <div class="current-pts-badge">
-    <span class="current-pts-label">現在のポイント</span>
-    <span class="current-pts-val" id="reward-pts">0pt</span>
+  <!-- ADD -->
+  <div id="screen-add" class="screen">
+    <h2 class="add-header">何をしましたか？</h2>
+    <p class="add-sub">タップして選んでね。複数選択もできるよ！</p>
+    <div class="tier-label"><span class="tier-badge tier-3">★★★ 3pt</span><span class="tier-desc">大変なお仕事！</span></div>
+    <div class="chore-grid" id="grid-3"></div>
+    <div class="tier-label"><span class="tier-badge tier-2">★★ 2pt</span><span class="tier-desc">ちょっと大変なお仕事</span></div>
+    <div class="chore-grid" id="grid-2"></div>
+    <div class="tier-label"><span class="tier-badge tier-1">★ 1pt</span><span class="tier-desc">日常のお仕事</span></div>
+    <div class="chore-grid" id="grid-1"></div>
+    <button class="add-btn" id="add-confirm-btn" onclick="confirmAdd()" disabled>
+      <span>ポイントを追加する</span><span id="add-pts-preview"></span>
+    </button>
   </div>
-  <div id="rewards-list"></div>
+
+  <!-- HISTORY -->
+  <div id="screen-history" class="screen">
+    <h2 class="history-screen-header">📋 履歴・取り消し</h2>
+    <p class="history-screen-sub" id="history-sub-note">みんなのお仕事履歴</p>
+    <div id="admin-only-note" style="display:none" class="admin-only-note">🔑 管理者のみ削除できます</div>
+    <div class="filter-row" id="filter-row"></div>
+    <div class="full-history-list" id="full-history-list"><div class="loading"><div class="loading-spinner">⏳</div><p>読み込み中...</p></div></div>
+  </div>
+
+  <!-- REWARDS -->
+  <div id="screen-rewards" class="screen">
+    <h2 class="reward-header">🎁 ごほうびリスト</h2>
+    <p class="reward-sub">ポイントをためてご褒美をゲットしよう！</p>
+    <div class="current-pts-badge">
+      <span class="current-pts-label">現在のポイント</span>
+      <span class="current-pts-val" id="reward-pts">0pt</span>
+    </div>
+    <div id="rewards-list"></div>
+  </div>
 </div>
 
 <!-- DELETE CONFIRM -->
@@ -253,7 +329,32 @@
 <div class="sparkle-container" id="sparkle-container"></div>
 <div class="toast" id="toast"></div>
 
-<script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ===== Firebase設定 =====
+const firebaseConfig = {
+  apiKey: "AIzaSyAqdL06VINg43Rc6rwXWVsd-Q2_LkK78Eg",
+  authDomain: "otetsuday.firebaseapp.com",
+  projectId: "otetsuday",
+  storageBucket: "otetsuday.firebasestorage.app",
+  messagingSenderId: "982484717295",
+  appId: "1:982484717295:web:56fdefd7bcbf2bae63d51a"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
+// ===== ユーザー設定 =====
+// 管理者のニックネームとパスワードをここで設定
+const USERS = {
+  "佐々木健人": { password: "00951125sasa", role: "admin" },
+  // 通常ユーザーはアプリ上で新規登録できます
+};
+// ★ 上の "管理者のニックネーム" と "admin1234" を自分たちの名前・パスワードに変えてください
+
 const CHORES = [
   { id:'bathroom', name:'水回り掃除', emoji:'🚿', pts:3, grid:3 },
   { id:'dishes', name:'食器洗い', emoji:'🍽️', pts:2, grid:2 },
@@ -277,28 +378,167 @@ const REWARDS = [
 ];
 
 const GOAL_PT = 1000;
-let state = { total:0, history:[], selected:new Set(), filterChore:'all' };
+
+// ===== 状態 =====
+let currentUser = null; // { name, role }
+let allHistory = [];
 let pendingDeleteId = null;
+let selectedChores = new Set();
+let filterChore = 'all';
+let unsubscribe = null;
+let prevTotal = 0;
 
-try {
-  const saved = localStorage.getItem('otetsuday_v3');
-  if (saved) { const p=JSON.parse(saved); state.total=p.total||0; state.history=p.history||[]; }
-} catch(e){}
+// ===== ログイン =====
+let isRegisterMode = false;
+window.toggleRegister = function() {
+  isRegisterMode = !isRegisterMode;
+  document.getElementById('login-btn').textContent = isRegisterMode ? '新規登録' : 'ログイン';
+  document.querySelector('.login-switch').innerHTML = isRegisterMode
+    ? 'すでにアカウントをお持ちの方は <span onclick="toggleRegister()">ログイン</span>'
+    : 'はじめての方は <span onclick="toggleRegister()">新規登録</span>';
+  document.getElementById('login-err').textContent = '';
+};
 
-function save() {
-  try { localStorage.setItem('otetsuday_v3', JSON.stringify({total:state.total,history:state.history})); } catch(e){}
+window.doLogin = async function() {
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-err');
+  if(!name || !pass) { errEl.textContent = 'ニックネームとパスワードを入力してください'; return; }
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+
+  try {
+    if(isRegisterMode) {
+      // 新規登録
+      const userRef = doc(db, 'users', name);
+      const snap = await getDoc(userRef);
+      if(snap.exists()) { errEl.textContent = 'そのニックネームはすでに使われています'; btn.disabled=false; return; }
+      await setDoc(userRef, { password: pass, role: 'user', createdAt: Date.now() });
+      currentUser = { name, role: 'user' };
+    } else {
+      // ログイン（コード内ユーザー or Firestoreユーザー）
+      if(USERS[name]) {
+        if(USERS[name].password !== pass) { errEl.textContent = 'パスワードが違います'; btn.disabled=false; return; }
+        currentUser = { name, role: USERS[name].role };
+      } else {
+        const userRef = doc(db, 'users', name);
+        const snap = await getDoc(userRef);
+        if(!snap.exists()) { errEl.textContent = 'ニックネームが見つかりません'; btn.disabled=false; return; }
+        if(snap.data().password !== pass) { errEl.textContent = 'パスワードが違います'; btn.disabled=false; return; }
+        currentUser = { name, role: snap.data().role };
+      }
+    }
+
+    // ログイン成功
+    try { localStorage.setItem('otetsuday_user', JSON.stringify(currentUser)); } catch(e){}
+    startApp();
+  } catch(e) {
+    errEl.textContent = '通信エラーが発生しました。再度お試しください。';
+    console.error(e);
+  }
+  btn.disabled = false;
+};
+
+window.doLogout = function() {
+  if(unsubscribe) unsubscribe();
+  currentUser = null;
+  try { localStorage.removeItem('otetsuday_user'); } catch(e){}
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+};
+
+function startApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  buildChoreCards();
+  setupRealtimeListener();
+  updateUserBadge();
+  requestNotifPermission();
+  showScreen('home');
 }
 
-function showScreen(name) {
+function updateUserBadge() {
+  if(!currentUser) return;
+  document.getElementById('home-username').textContent = currentUser.name;
+  document.getElementById('home-role').textContent = currentUser.role === 'admin' ? '👑 管理者' : '🌿 メンバー';
+  document.getElementById('home-avatar').textContent = currentUser.role === 'admin' ? '👑' : '🌿';
+  document.getElementById('home-avatar').className = 'user-avatar ' + (currentUser.role==='admin'?'avatar-admin':'avatar-user');
+  // 管理者注記
+  const note = document.getElementById('admin-only-note');
+  if(note) note.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+}
+
+// ===== Firestore リアルタイム =====
+function setupRealtimeListener() {
+  if(unsubscribe) unsubscribe();
+  const q = query(collection(db, 'history'), orderBy('ts', 'desc'));
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    allHistory = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+    const newTotal = allHistory.reduce((s,h)=>s+h.pts, 0);
+
+    // 他の人が追加した通知
+    if(newTotal > prevTotal && prevTotal > 0) {
+      const diff = newTotal - prevTotal;
+      const latest = allHistory[0];
+      if(latest && latest.userName !== currentUser?.name) {
+        sendNotification(`${latest.userName}がお仕事したよ！`, `${latest.name} +${diff}pt 👏`);
+      }
+    }
+    prevTotal = newTotal;
+    renderHome();
+    const histScreen = document.getElementById('screen-history');
+    if(histScreen && histScreen.classList.contains('active')) renderFullHistory();
+  });
+}
+
+// ===== 通知 =====
+window.requestNotifPermission = async function() {
+  if(!('Notification' in window)) return;
+  if(Notification.permission === 'default') {
+    // Show banner
+    showNotifBanner();
+  }
+};
+
+function showNotifBanner() {
+  const existing = document.getElementById('notif-banner');
+  if(existing) return;
+  const banner = document.createElement('div');
+  banner.id = 'notif-banner';
+  banner.className = 'notif-banner';
+  banner.innerHTML = `<div class="notif-banner-info">通知を許可する<div class="notif-banner-sub">パートナーがお仕事したら知らせるよ🔔</div></div><button class="notif-allow-btn" onclick="allowNotif()">許可する</button>`;
+  const homeScreen = document.getElementById('screen-home');
+  homeScreen.insertBefore(banner, homeScreen.children[2]);
+}
+
+window.allowNotif = async function() {
+  const perm = await Notification.requestPermission();
+  const banner = document.getElementById('notif-banner');
+  if(banner) banner.remove();
+  if(perm === 'granted') showToast('🔔 通知を許可しました！');
+};
+
+function sendNotification(title, body) {
+  if(Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '🏠' });
+  }
+}
+
+// ===== ホーム =====
+window.showScreen = function(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
-  const idx=['home','add','history','rewards'].indexOf(name);
-  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  ['home','add','history','rewards'].forEach((n,i)=>{
+    document.querySelectorAll('.nav-btn')[i].classList.toggle('active', n===name);
+  });
   if(name==='home') renderHome();
   if(name==='history') renderFullHistory();
   if(name==='rewards') renderRewards();
-}
+};
+
+function getTotal() { return allHistory.reduce((s,h)=>s+h.pts,0); }
 
 function getNextReward(pts) {
   const nextJuice = Math.ceil((pts+1)/10)*10;
@@ -307,99 +547,52 @@ function getNextReward(pts) {
 }
 
 function renderHome() {
-  const pts = state.total;
+  if(!currentUser) return;
+  const pts = getTotal();
   document.getElementById('total-pts').textContent = pts;
   const today = new Date().toDateString();
-  const todayPts = state.history.filter(h=>new Date(h.ts).toDateString()===today).reduce((s,h)=>s+h.pts,0);
+  const todayPts = allHistory.filter(h=>new Date(h.ts).toDateString()===today).reduce((s,h)=>s+h.pts,0);
   document.getElementById('today-pts-label').textContent = `今日 +${todayPts}pt 獲得！`;
   document.getElementById('goal-fill').style.width = Math.min(100,Math.round(pts/GOAL_PT*100))+'%';
   document.getElementById('goal-count').textContent = `${pts} / ${GOAL_PT} pt`;
   const next = getNextReward(pts);
   const base = next.interval ? Math.floor(pts/10)*10 : (() => { const b=REWARDS.filter(r=>!r.interval&&r.pts<=pts); return b.length?Math.max(...b.map(r=>r.pts)):0; })();
-  const prog = base>=next.pts?100:Math.round((pts-base)/(next.pts-base)*100);
+  const prog = next.pts===base ? 100 : Math.round((pts-base)/(next.pts-base)*100);
   document.getElementById('next-emoji').textContent = next.emoji;
   document.getElementById('next-reward-name').textContent = next.name;
   document.getElementById('next-reward-fill').style.width = Math.min(100,Math.max(0,prog))+'%';
   document.getElementById('next-reward-pts').textContent = `${pts} / ${next.pts} pt`;
   const hour = new Date().getHours();
   document.getElementById('greeting').textContent = hour<12?'おはよう ☀️':hour<18?'こんにちは 🌤️':'こんばんは 🌙';
-  const todayItems = state.history.filter(h=>new Date(h.ts).toDateString()===today).slice().reverse();
+  const todayItems = allHistory.filter(h=>new Date(h.ts).toDateString()===today);
   const list = document.getElementById('history-list-home');
   list.innerHTML = !todayItems.length
     ? '<div class="empty-state"><div class="empty-emoji">🌿</div><p>まだ記録がありません<br>最初のお仕事を記録しよう！</p></div>'
-    : todayItems.map(h=>renderHistoryItem(h,true)).join('');
+    : todayItems.map(h=>renderHistoryItem(h)).join('');
 }
 
-function renderHistoryItem(h, showDelete) {
+function renderHistoryItem(h) {
   const c = CHORES.find(c=>c.id===h.id)||{emoji:'✅',name:h.name||h.id,pts:h.pts};
   const t = new Date(h.ts);
   const ts = t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
   const bg = {3:'background:#FFFAEB',2:'background:#F0ECFF',1:'background:#E8F8F0'}[c.pts]||'';
+  const canDelete = currentUser?.role === 'admin';
   return `<div class="history-item" id="hitem-${h.uid}">
     <div class="history-icon" style="${bg}">${c.emoji}</div>
-    <div class="history-info"><p class="history-name">${c.name}</p><p class="history-time">${ts}</p></div>
+    <div class="history-info">
+      <p class="history-name">${c.name}</p>
+      <p class="history-time">${ts}</p>
+      <p class="history-who">${h.userName || ''}さん</p>
+    </div>
     <span class="history-pts">+${h.pts}pt</span>
-    ${showDelete?`<button class="delete-btn" onclick="askDelete('${h.uid}')">✕</button>`:''}
+    <button class="delete-btn ${canDelete?'':'delete-btn-hidden'}" onclick="askDelete('${h.uid}')" ${canDelete?'':'tabindex="-1"'}>✕</button>
   </div>`;
 }
 
-function renderFullHistory() {
-  const choreIds = [...new Set(state.history.map(h=>h.id))];
-  document.getElementById('filter-row').innerHTML =
-    `<button class="filter-btn ${state.filterChore==='all'?'active':''}" onclick="setFilter('all')">すべて</button>`
-    + choreIds.map(id=>{ const c=CHORES.find(c=>c.id===id)||{emoji:'✅',name:id}; return `<button class="filter-btn ${state.filterChore===id?'active':''}" onclick="setFilter('${id}')">${c.emoji} ${c.name}</button>`; }).join('');
-  const filtered = state.filterChore==='all'?state.history:state.history.filter(h=>h.id===state.filterChore);
-  const sorted = [...filtered].reverse();
-  if(!sorted.length) { document.getElementById('full-history-list').innerHTML='<div class="empty-state"><div class="empty-emoji">🌿</div><p>記録がありません</p></div>'; return; }
-  const groups = {};
-  sorted.forEach(h=>{ const dk=new Date(h.ts).toDateString(); if(!groups[dk])groups[dk]=[]; groups[dk].push(h); });
-  document.getElementById('full-history-list').innerHTML = Object.entries(groups).map(([dk,items])=>{
-    const d=new Date(dk), label=formatDateLabel(d), dayPts=items.reduce((s,h)=>s+h.pts,0);
-    return `<div class="history-date-group"><div class="history-date-label">${label}<span class="date-pts">+${dayPts}pt</span></div>${items.map(h=>renderHistoryItem(h,true)).join('')}</div>`;
-  }).join('');
-}
-
-function formatDateLabel(d) {
-  const today=new Date(); today.setHours(0,0,0,0);
-  const yesterday=new Date(today); yesterday.setDate(today.getDate()-1);
-  d.setHours(0,0,0,0);
-  if(d.getTime()===today.getTime()) return '今日';
-  if(d.getTime()===yesterday.getTime()) return '昨日';
-  return `${d.getMonth()+1}月${d.getDate()}日`;
-}
-
-function setFilter(id) { state.filterChore=id; renderFullHistory(); }
-
-function askDelete(uid) {
-  pendingDeleteId=uid;
-  const h=state.history.find(h=>h.uid===uid); if(!h)return;
-  const c=CHORES.find(c=>c.id===h.id)||{emoji:'✅',name:h.name||h.id,pts:h.pts};
-  const t=new Date(h.ts);
-  const ts=`${t.getMonth()+1}月${t.getDate()}日 ${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}`;
-  document.getElementById('delete-confirm-item').innerHTML=`<span style="font-size:28px">${c.emoji}</span><div style="flex:1"><p style="font-size:13px;font-weight:700">${c.name}</p><p style="font-size:11px;color:var(--text-sub)">${ts}</p></div><span style="font-size:16px;font-weight:800;color:#E07070">-${h.pts}pt</span>`;
-  document.getElementById('delete-overlay').classList.add('show');
-}
-
-function cancelDelete() { pendingDeleteId=null; document.getElementById('delete-overlay').classList.remove('show'); }
-
-function executeDelete() {
-  if(!pendingDeleteId)return;
-  const idx=state.history.findIndex(h=>h.uid===pendingDeleteId); if(idx===-1)return;
-  const h=state.history[idx];
-  state.total=Math.max(0,state.total-h.pts);
-  state.history.splice(idx,1);
-  save();
-  document.getElementById('delete-overlay').classList.remove('show');
-  pendingDeleteId=null;
-  showToast(`🗑️ ${h.pts}pt を取り消しました`);
-  const el=document.getElementById('hitem-'+h.uid);
-  if(el){el.classList.add('deleting');setTimeout(()=>{renderFullHistory();renderHome();},350);}
-  else{renderFullHistory();renderHome();}
-}
-
+// ===== 追加 =====
 function buildChoreCards() {
   [3,2,1].forEach(tier=>{
-    document.getElementById('grid-'+tier).innerHTML=CHORES.filter(c=>c.pts===tier).map(c=>`
+    document.getElementById('grid-'+tier).innerHTML = CHORES.filter(c=>c.pts===tier).map(c=>`
       <div class="chore-card pts-${c.pts}" id="chore-${c.id}" onclick="toggleChore('${c.id}')">
         <div class="check-overlay">✓</div>
         <span class="chore-emoji">${c.emoji}</span>
@@ -409,45 +602,116 @@ function buildChoreCards() {
   });
 }
 
-function toggleChore(id) {
-  if(state.selected.has(id))state.selected.delete(id);else state.selected.add(id);
-  document.getElementById('chore-'+id).classList.toggle('selected',state.selected.has(id));
+window.toggleChore = function(id) {
+  if(selectedChores.has(id)) selectedChores.delete(id); else selectedChores.add(id);
+  document.getElementById('chore-'+id).classList.toggle('selected', selectedChores.has(id));
   updateAddBtn();
-}
+};
 
 function updateAddBtn() {
-  const total=[...state.selected].reduce((s,id)=>{const c=CHORES.find(c=>c.id===id);return s+(c?c.pts:0);},0);
-  document.getElementById('add-confirm-btn').disabled=state.selected.size===0;
-  document.getElementById('add-pts-preview').textContent=state.selected.size>0?`+${total}pt`:'';
+  const total=[...selectedChores].reduce((s,id)=>{const c=CHORES.find(c=>c.id===id);return s+(c?c.pts:0);},0);
+  document.getElementById('add-confirm-btn').disabled = selectedChores.size===0;
+  document.getElementById('add-pts-preview').textContent = selectedChores.size>0?`+${total}pt`:'';
 }
 
-function confirmAdd() {
-  const now=Date.now(); let gained=0; const prev=state.total;
-  state.selected.forEach(id=>{ const c=CHORES.find(c=>c.id===id);if(!c)return; gained+=c.pts; state.history.push({uid:now+'-'+id,id:c.id,name:c.name,pts:c.pts,ts:now}); });
-  state.total+=gained; state.selected.clear();
-  document.querySelectorAll('.chore-card').forEach(el=>el.classList.remove('selected'));
-  updateAddBtn(); checkRewardTriggers(prev,state.total); save();
-  showSparkles(); showToast(`✨ +${gained}pt 追加しました！`);
-  setTimeout(()=>showScreen('home'),800);
-}
+window.confirmAdd = async function() {
+  if(!currentUser) return;
+  const btn = document.getElementById('add-confirm-btn');
+  btn.disabled = true;
+  const now = Date.now();
+  let gained = 0;
+  const prevPts = getTotal();
+  try {
+    for(const id of selectedChores) {
+      const c = CHORES.find(c=>c.id===id); if(!c) continue;
+      gained += c.pts;
+      await addDoc(collection(db, 'history'), {
+        id: c.id, name: c.name, pts: c.pts, ts: now, userName: currentUser.name
+      });
+    }
+    selectedChores.clear();
+    document.querySelectorAll('.chore-card').forEach(el=>el.classList.remove('selected'));
+    updateAddBtn();
+    checkRewardTriggers(prevPts, prevPts+gained);
+    showSparkles();
+    showToast(`✨ +${gained}pt 追加しました！`);
+    setTimeout(()=>showScreen('home'), 800);
+  } catch(e) {
+    showToast('エラーが発生しました😢');
+    console.error(e);
+    btn.disabled = false;
+  }
+};
 
-function checkRewardTriggers(prev,curr) {
+function checkRewardTriggers(prev, curr) {
   if(Math.floor(curr/10)>Math.floor(prev/10)) setTimeout(()=>showToast('🥤 ジュース獲得！おつかれさま✨'),1200);
-  REWARDS.filter(r=>!r.interval&&!r.isGoal).forEach(r=>{ if(prev<r.pts&&curr>=r.pts) setTimeout(()=>{showSparkles();showToast(`🎉 ${r.name} 達成！おめでとう！`);},1600); });
+  REWARDS.filter(r=>!r.interval&&!r.isGoal).forEach(r=>{
+    if(prev<r.pts&&curr>=r.pts) setTimeout(()=>{showSparkles();showToast(`🎉 ${r.name} 達成！おめでとう！`);},1600);
+  });
   if(prev<GOAL_PT&&curr>=GOAL_PT) setTimeout(()=>{showSparkles();showSparkles();document.getElementById('goal-modal').classList.add('show');},2000);
 }
 
-function closeModal() { document.getElementById('goal-modal').classList.remove('show'); }
+// ===== 履歴・削除 =====
+window.renderFullHistory = function() {
+  const filtered = filterChore==='all' ? allHistory : allHistory.filter(h=>h.id===filterChore);
+  const choreIds = [...new Set(allHistory.map(h=>h.id))];
+  document.getElementById('filter-row').innerHTML =
+    `<button class="filter-btn ${filterChore==='all'?'active':''}" onclick="setFilter('all')">すべて</button>`
+    + choreIds.map(id=>{ const c=CHORES.find(c=>c.id===id)||{emoji:'✅',name:id}; return `<button class="filter-btn ${filterChore===id?'active':''}" onclick="setFilter('${id}')">${c.emoji} ${c.name}</button>`; }).join('');
 
+  if(!filtered.length) { document.getElementById('full-history-list').innerHTML='<div class="empty-state"><div class="empty-emoji">🌿</div><p>記録がありません</p></div>'; return; }
+  const groups = {};
+  filtered.forEach(h=>{ const dk=new Date(h.ts).toDateString(); if(!groups[dk])groups[dk]=[]; groups[dk].push(h); });
+  document.getElementById('full-history-list').innerHTML = Object.entries(groups).map(([dk,items])=>{
+    const d=new Date(dk), dayPts=items.reduce((s,h)=>s+h.pts,0);
+    return `<div class="history-date-group"><div class="history-date-label">${formatDateLabel(d)}<span class="date-pts">+${dayPts}pt</span></div>${items.map(h=>renderHistoryItem(h)).join('')}</div>`;
+  }).join('');
+};
+
+window.setFilter = function(id) { filterChore=id; renderFullHistory(); };
+
+function formatDateLabel(d) {
+  const today=new Date(); today.setHours(0,0,0,0);
+  const yesterday=new Date(today); yesterday.setDate(today.getDate()-1);
+  const dd=new Date(d); dd.setHours(0,0,0,0);
+  if(dd.getTime()===today.getTime()) return '今日';
+  if(dd.getTime()===yesterday.getTime()) return '昨日';
+  return `${d.getMonth()+1}月${d.getDate()}日`;
+}
+
+window.askDelete = function(uid) {
+  if(currentUser?.role !== 'admin') return;
+  pendingDeleteId = uid;
+  const h = allHistory.find(h=>h.uid===uid); if(!h) return;
+  const c = CHORES.find(c=>c.id===h.id)||{emoji:'✅',name:h.name||h.id};
+  const t = new Date(h.ts);
+  document.getElementById('delete-confirm-item').innerHTML=`<span style="font-size:28px">${c.emoji}</span><div style="flex:1"><p style="font-size:13px;font-weight:700">${c.name}</p><p style="font-size:11px;color:var(--text-sub)">${t.getMonth()+1}月${t.getDate()}日 ${h.userName||''}さん</p></div><span style="font-size:16px;font-weight:800;color:#E07070">-${h.pts}pt</span>`;
+  document.getElementById('delete-overlay').classList.add('show');
+};
+
+window.cancelDelete = function() { pendingDeleteId=null; document.getElementById('delete-overlay').classList.remove('show'); };
+
+window.executeDelete = async function() {
+  if(!pendingDeleteId || currentUser?.role !== 'admin') return;
+  try {
+    const h = allHistory.find(h=>h.uid===pendingDeleteId);
+    await deleteDoc(doc(db, 'history', pendingDeleteId));
+    document.getElementById('delete-overlay').classList.remove('show');
+    pendingDeleteId = null;
+    showToast(`🗑️ ${h?.pts||0}pt を取り消しました`);
+  } catch(e) { showToast('削除に失敗しました😢'); console.error(e); }
+};
+
+// ===== ごほうび =====
 function renderRewards() {
-  const pts=state.total;
-  document.getElementById('reward-pts').textContent=pts+'pt';
-  let foundNext=false;
-  document.getElementById('rewards-list').innerHTML=REWARDS.map(r=>{
+  const pts = getTotal();
+  document.getElementById('reward-pts').textContent = pts+'pt';
+  let foundNext = false;
+  document.getElementById('rewards-list').innerHTML = REWARDS.map(r=>{
     const achieved=pts>=r.pts, isNext=!achieved&&!foundNext&&!r.interval;
-    if(isNext)foundNext=true;
-    let prog,baseLabel;
-    if(r.interval){const n=Math.floor(pts/r.pts);prog=Math.round((pts%r.pts)/r.pts*100);baseLabel=`${n}回獲得済み / 次は ${(n+1)*r.pts}pt`;}
+    if(isNext) foundNext=true;
+    let prog, baseLabel;
+    if(r.interval){const n=Math.floor(pts/r.pts);prog=Math.round((pts%r.pts)/r.pts*100);baseLabel=`${n}回獲得済み / 次は${(n+1)*r.pts}pt`;}
     else{prog=Math.min(100,Math.round(pts/r.pts*100));baseLabel=`${pts} / ${r.pts} pt`;}
     return `<div class="reward-item ${achieved?'achieved':''} ${isNext?'next-up':''}">
       <span class="reward-emoji-big">${r.emoji}</span>
@@ -458,6 +722,9 @@ function renderRewards() {
   }).join('');
 }
 
+window.closeModal = function() { document.getElementById('goal-modal').classList.remove('show'); };
+
+// ===== エフェクト =====
 function showSparkles() {
   const container=document.getElementById('sparkle-container');
   ['✨','⭐','🌟','💫','🎉','🌸','💖','🏠'].forEach((e,i)=>{
@@ -465,13 +732,19 @@ function showSparkles() {
   });
 }
 
-function showToast(msg) {
+window.showToast = function(msg) {
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2400);
-}
+};
 
-buildChoreCards();
-renderHome();
+// ===== 自動ログイン =====
+try {
+  const saved = localStorage.getItem('otetsuday_user');
+  if(saved) {
+    currentUser = JSON.parse(saved);
+    startApp();
+  }
+} catch(e){}
 </script>
 </body>
 </html>
